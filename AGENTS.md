@@ -94,6 +94,14 @@ Each ePrint JSON file contains:
   - `license`: License URL
   - `citation`: Text and BibTeX citation formats
 
+### Lint
+
+```bash
+python3 -m flake8 scripts/ --max-line-length=120
+```
+
+There are a few pre-existing style warnings (whitespace, blank lines, unused f-string) in the existing code.
+
 ### Testing
 
 No automated tests exist yet. To verify the scripts work:
@@ -107,3 +115,11 @@ cat data/2026-04-08_arxiv_blockchain.json
 python scripts/fetch_eprint_daily.py --date 2026-04-08
 cat data/2026-04-08_eprint_blockchain.json
 ```
+
+### Gotchas
+
+- The arXiv fetcher iterates ~61 keywords sequentially with 0.5s sleep between each, so a full run takes ~30-40 seconds.
+- arXiv does not publish papers on weekends/holidays; fetching weekend dates yields 0 papers.
+- The ePrint RSS feed only contains recent submissions; fetching dates older than a few days yields 0 papers.
+- Both scripts attempt webhook delivery to a hardcoded URL in `scripts/webhook_utils.py`. Webhook failures are caught and counted but are non-fatal.
+- Scripts import from sibling modules (`blockchain_common`, `webhook_utils`), so they must be run from the repo root (or with `scripts/` on `PYTHONPATH`).
