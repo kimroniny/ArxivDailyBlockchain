@@ -1,0 +1,39 @@
+{
+  "date": "2026-04-09",
+  "query": {
+    "source": "arXiv API",
+    "keyword": "blockchain",
+    "sort_by": "submittedDate desc"
+  },
+  "generated_at_utc": "2026-04-12T04:02:55.662084+00:00",
+  "paper_count": 1,
+  "papers": [
+    {
+      "arxiv_id": "2604.08205v1",
+      "title": "Competitive Transaction Admission in PCNs: Online Knapsack with Positive and Negative Items",
+      "url": "http://arxiv.org/abs/2604.08205v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.08205v1",
+      "authors": [
+        "Marcin Bienkowski",
+        "Julien Dallot",
+        "Dominik Danelski",
+        "Maciej Pacut",
+        "Stefan Schmid"
+      ],
+      "abstract": "Payment channel networks (PCNs) are a promising solution to make cryptocurrency transactions faster and more scalable. At their core, PCNs bypass the blockchain by routing the transactions through intermediary channels. However, a channel can forward a transaction only if it possesses the necessary funds: the problem of keeping the channels balanced is a current bottleneck on the PCN's transaction throughput. This paper considers the problem of maximizing the number of accepted transactions by a channel in a PCN. Previous works either considered the associated optimization problem with all transactions known in advance or developed heuristics tested on particular transaction datasets. This work however considers the problem in its purely online form where the transactions are arbitrary and revealed one after the other. We show that the problem can be modeled as a new online knapsack variant where the items (transaction proposals) can be either positive or negative depending on the direction of the transaction. The main contribution of this paper is a deterministic online algorithm that is $O(\\log B)$-competitive, where $B$ is the knapsack capacity (initially allocated funds). We complement this result with an asymptotically matching lower bound of $Ω(\\log B)$ which holds for any randomized algorithm, demonstrating our algorithm's optimality.",
+      "published": "2026-04-09T13:06:38Z",
+      "updated": "2026-04-09T13:06:38Z",
+      "published_date": "2026-04-09",
+      "categories": [
+        "cs.DS"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": null,
+      "citation": {
+        "text": "Marcin Bienkowski, Julien Dallot, Dominik Danelski, Maciej Pacut, Stefan Schmid (2026). Competitive Transaction Admission in PCNs: Online Knapsack with Positive and Negative Items. arXiv:2604.08205v1",
+        "bibtex": "@article{Bienkowski2026260408205v1,\n  title={Competitive Transaction Admission in PCNs: Online Knapsack with Positive and Negative Items},\n  author={Marcin Bienkowski, Julien Dallot, Dominik Danelski, Maciej Pacut, Stefan Schmid},\n  journal={arXiv preprint arXiv:2604.08205v1},\n  year={2026}\n}"
+      }
+    }
+  ]
+}

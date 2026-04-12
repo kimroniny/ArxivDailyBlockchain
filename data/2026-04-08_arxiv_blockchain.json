@@ -1,0 +1,117 @@
+{
+  "date": "2026-04-08",
+  "query": {
+    "source": "arXiv API",
+    "keyword": "blockchain",
+    "sort_by": "submittedDate desc"
+  },
+  "generated_at_utc": "2026-04-12T04:03:09.750427+00:00",
+  "paper_count": 4,
+  "papers": [
+    {
+      "arxiv_id": "2604.07568v1",
+      "title": "MEV-ACE: Identity-Authenticated Fair Ordering for Proposer-Controlled MEV Mitigation",
+      "url": "http://arxiv.org/abs/2604.07568v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.07568v1",
+      "authors": [
+        "Jian Sheng Wang"
+      ],
+      "abstract": "Maximal Extractable Value, or MEV, remains a structural threat to blockchain fairness because a block producer can often observe pending transactions and unilaterally decide their ordering or inclusion. Existing mitigations hide transaction contents or outsource ordering, but they often leave two gaps unresolved. First, commitments are not authenticated by slashable identities. Second, inclusion obligations are not backed by transferable evidence that other validators can verify. This paper presents MEV ACE, a fair ordering protocol for proposer controlled ordering MEV. MEV ACE combines three mechanisms. First, it uses registered economic identities whose authentication keys are deterministically derived from the ACE GF framework and bonded on chain. Second, it uses authenticated commit and open messages with validator receipt thresholds, which make admissibility and inclusion obligations independently auditable. Third, it uses verifiable delay based randomness to determine transaction order only after the admissible commitment set is fixed. We formalize the protocol in a Byzantine fault tolerant validator model with threshold receipts and show three properties under standard assumptions: order unpredictability after the admissible set is locked, commitment authenticity under signature unforgeability, and accountable inclusion for transactions that obtain threshold commit and open receipts. Under these conditions, and when producer and user bonds exceed the one slot gain from invalid execution or selective non opening, MEV ACE removes unilateral proposer discretion over front running, sandwich attacks, and censorship against admitted transactions. The protocol remains single slot in structure, requires no threshold decryption committee, and is compatible with post quantum signature schemes such as ML DSA 44.",
+      "published": "2026-04-08T20:12:06Z",
+      "updated": "2026-04-08T20:12:06Z",
+      "published_date": "2026-04-08",
+      "categories": [
+        "cs.CR",
+        "cs.DC"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": "18 Pages",
+      "citation": {
+        "text": "Jian Sheng Wang (2026). MEV-ACE: Identity-Authenticated Fair Ordering for Proposer-Controlled MEV Mitigation. arXiv:2604.07568v1",
+        "bibtex": "@article{Wang2026260407568v1,\n  title={MEV-ACE: Identity-Authenticated Fair Ordering for Proposer-Controlled MEV Mitigation},\n  author={Jian Sheng Wang},\n  journal={arXiv preprint arXiv:2604.07568v1},\n  year={2026}\n}"
+      }
+    },
+    {
+      "arxiv_id": "2604.07007v1",
+      "title": "AgentCity: Constitutional Governance for Autonomous Agent Economies via Separation of Power",
+      "url": "http://arxiv.org/abs/2604.07007v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.07007v1",
+      "authors": [
+        "Anbang Ruan",
+        "Xing Zhang"
+      ],
+      "abstract": "Autonomous AI agents are beginning to operate across organizational boundaries on the open internet -- discovering, transacting with, and delegating to agents owned by other parties without centralized oversight. When agents from different human principals collaborate at scale, the collective becomes opaque: no single human can observe, audit, or govern the emergent behavior. We term this the Logic Monopoly -- the agent society's unchecked monopoly over the entire logic chain from planning through execution to evaluation. We propose the Separation of Power (SoP) model, a constitutional governance architecture deployed on public blockchain that breaks this monopoly through three structural separations: agents legislate operational rules as smart contracts, deterministic software executes within those contracts, and humans adjudicate through a complete ownership chain binding every agent to a responsible principal. In this architecture, smart contracts are the law itself -- the actual legislative output that agents produce and that governs their behavior. We instantiate SoP in AgentCity on an EVM-compatible layer-2 blockchain (L2) with a three-tier contract hierarchy (foundational, meta, and operational). The core thesis is alignment-through-accountability: if each agent is aligned with its human owner through the accountability chain, then the collective converges on behavior aligned with human intent -- without top-down rules. A pre-registered experiment evaluates this thesis in a commons production economy -- where agents share a finite resource pool and collaboratively produce value -- at 50-1,000 agent scale.",
+      "published": "2026-04-08T12:28:20Z",
+      "updated": "2026-04-08T12:28:20Z",
+      "published_date": "2026-04-08",
+      "categories": [
+        "cs.MA",
+        "cs.AI",
+        "cs.CY"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": "111 pages, 11 figures, 19 tables, 67 references. Pre-registered experimental design",
+      "citation": {
+        "text": "Anbang Ruan, Xing Zhang (2026). AgentCity: Constitutional Governance for Autonomous Agent Economies via Separation of Power. arXiv:2604.07007v1",
+        "bibtex": "@article{Ruan2026260407007v1,\n  title={AgentCity: Constitutional Governance for Autonomous Agent Economies via Separation of Power},\n  author={Anbang Ruan, Xing Zhang},\n  journal={arXiv preprint arXiv:2604.07007v1},\n  year={2026}\n}"
+      }
+    },
+    {
+      "arxiv_id": "2604.06608v1",
+      "title": "SoK of RWA Tokenization: A Systematization of Concepts, Architectures, and Legal Interoperability",
+      "url": "http://arxiv.org/abs/2604.06608v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.06608v1",
+      "authors": [
+        "Junliang Luo",
+        "Xihan Xiong",
+        "Zonglun Li",
+        "Hong Kang",
+        "Xue Liu",
+        "William J Knottenbelt",
+        "Katrin Tinn"
+      ],
+      "abstract": "The global financial architecture is undergoing a shift from intermediary centric-settlement to programmable infrastructure, to transmute trillions in static illiquid capital into active, high-velocity instruments. We argue that Real World Asset (RWA) tokenization represents a conceptual evolution beyond mere digitization, converting passive ledger entries into programmable economic agents capable of autonomous settlement and algorithmic collateralization. However, achieving such seamless capital efficiency necessitates resolving the fundamental friction between deterministic on-chain code and probabilistic off-chain reality, navigating the oracle problem and jurisdictional interoperability. This systematization of knowledge presents a taxonomy for the RWA lifecycle and deconstructs the multi-layered architecture, spanning legal custody, technical standards, and cryptoeconomic valuation, required to enforce off-chain rights within on-chain environments. We study systemic constraints such as latency and regulatory fragmentation through a comparative overview of sovereign debt, private credit, and real estate protocols, complemented by an empirical case study of on-chain U.S. Treasuries. We synthesize these findings to propose a prognostic outlook, positing that while asset tokenization provides a transitional bridge, it is not necessarily the inevitable shift compared to the emergence of unified, programmable ledgers.",
+      "published": "2026-04-08T02:41:23Z",
+      "updated": "2026-04-08T02:41:23Z",
+      "published_date": "2026-04-08",
+      "categories": [
+        "q-fin.GN"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": "accepted at the 8th edition of the IEEE International Conference on Blockchain and Cryptocurrency (ICBC 2026)",
+      "citation": {
+        "text": "Junliang Luo, Xihan Xiong, Zonglun Li, Hong Kang, Xue Liu, William J Knottenbelt, Katrin Tinn (2026). SoK of RWA Tokenization: A Systematization of Concepts, Architectures, and Legal Interoperability. arXiv:2604.06608v1",
+        "bibtex": "@article{Luo2026260406608v1,\n  title={SoK of RWA Tokenization: A Systematization of Concepts, Architectures, and Legal Interoperability},\n  author={Junliang Luo, Xihan Xiong, Zonglun Li, Hong Kang, Xue Liu, William J Knottenbelt, Katrin Tinn},\n  journal={arXiv preprint arXiv:2604.06608v1},\n  year={2026}\n}"
+      }
+    },
+    {
+      "arxiv_id": "2604.06579v1",
+      "title": "SonicDB S6: A Storage-Efficient Verkle Trie for High-Throughput Blockchains",
+      "url": "http://arxiv.org/abs/2604.06579v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.06579v1",
+      "authors": [
+        "Luigi Crisci",
+        "Lorenz Schuler",
+        "Herbert Jordan",
+        "Bernhard Scholz"
+      ],
+      "abstract": "The Ethereum state database uses Merkle Patricia Trie (MPT), which suffers from large witness proof sizes and high storage overhead. Verkle Tries have been proposed as a replacement, offering witness proofs below 150 bytes through vector commitments and Inner Product Argument aggregation. However, deploying a Verkle Trie in a high-throughput, short block-time blockchain such as Sonic, which produces a block every 300 milliseconds, introduces substantial engineering challenges related to storage efficiency, commitment computation costs, and the need to serve both live and historical state queries in real time. We present SonicDB S6, a production Rust Verkle Trie database for the Sonic blockchain, which leverages its non-forking property to enable aggressive storage optimizations. Occupancy-aware node specializations, selected via an O(kn2) dynamic program, reduce live storage by 98%. Delta nodes that record only changed slots reduce archive storage by 95%. Batched updates, multi-threaded commitment computation, and homomorphic Pedersen caching yield 2.85x higher throughput than a persistent Geth Verkle baseline while sustaining production block-rate performance.",
+      "published": "2026-04-08T02:07:12Z",
+      "updated": "2026-04-08T02:07:12Z",
+      "published_date": "2026-04-08",
+      "categories": [
+        "cs.DB"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": "41 pages, 19 figures",
+      "citation": {
+        "text": "Luigi Crisci, Lorenz Schuler, Herbert Jordan, Bernhard Scholz (2026). SonicDB S6: A Storage-Efficient Verkle Trie for High-Throughput Blockchains. arXiv:2604.06579v1",
+        "bibtex": "@article{Crisci2026260406579v1,\n  title={SonicDB S6: A Storage-Efficient Verkle Trie for High-Throughput Blockchains},\n  author={Luigi Crisci, Lorenz Schuler, Herbert Jordan, Bernhard Scholz},\n  journal={arXiv preprint arXiv:2604.06579v1},\n  year={2026}\n}"
+      }
+    }
+  ]
+}
