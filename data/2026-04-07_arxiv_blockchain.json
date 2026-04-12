@@ -1,0 +1,89 @@
+{
+  "date": "2026-04-07",
+  "query": {
+    "source": "arXiv API",
+    "keyword": "blockchain",
+    "sort_by": "submittedDate desc"
+  },
+  "generated_at_utc": "2026-04-12T04:03:09.741720+00:00",
+  "paper_count": 3,
+  "papers": [
+    {
+      "arxiv_id": "2604.06323v2",
+      "title": "Blockchain and AI: Securing Intelligent Networks for the Future",
+      "url": "http://arxiv.org/abs/2604.06323v2",
+      "pdf_url": "https://arxiv.org/pdf/2604.06323v2",
+      "authors": [
+        "Joy Dutta",
+        "Hossien B. Eldeeb",
+        "Tu Dac Ho"
+      ],
+      "abstract": "Blockchain and artificial intelligence (AI) are increasingly proposed together for securing intelligent networks, but the literature remains fragmented across ledger design, AI-driven detection, cyber-physical applications, and emerging agentic workflows. This paper synthesizes the area through three reusable contributions: (i) a taxonomy of blockchain-AI security for intelligent networks, (ii) integration patterns for verifiable and adaptive security workflows, and (iii) the Blockchain-AI Security Evaluation Blueprint (BASE), a reporting checklist spanning AI quality, ledger behavior, end-to-end service levels, privacy, energy, and reproducibility. The paper also maps the evidence landscape across IoT, critical infrastructure, smart grids, transportation, and healthcare, showing that the conceptual fit is strong but real-world evidence remains uneven and often prototype-heavy. The synthesis clarifies where blockchain contributes provenance, trust, and auditability, where AI contributes detection, adaptation, and orchestration, and where future work should focus on interoperable interfaces, privacy-preserving analytics, bounded agentic automation, and open cross-domain benchmarks. The paper is intended as a reference for researchers and practitioners designing secure, transparent, and resilient intelligent networks.",
+      "published": "2026-04-07T18:00:40Z",
+      "updated": "2026-04-09T08:31:16Z",
+      "published_date": "2026-04-07",
+      "categories": [
+        "cs.CR",
+        "cs.AI"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": null,
+      "citation": {
+        "text": "Joy Dutta, Hossien B. Eldeeb, Tu Dac Ho (2026). Blockchain and AI: Securing Intelligent Networks for the Future. arXiv:2604.06323v2",
+        "bibtex": "@article{Dutta2026260406323v2,\n  title={Blockchain and AI: Securing Intelligent Networks for the Future},\n  author={Joy Dutta, Hossien B. Eldeeb, Tu Dac Ho},\n  journal={arXiv preprint arXiv:2604.06323v2},\n  year={2026}\n}"
+      }
+    },
+    {
+      "arxiv_id": "2604.06092v1",
+      "title": "Inertial Mining: Equilibrium Implementation of the Bitcoin Protocol",
+      "url": "http://arxiv.org/abs/2604.06092v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.06092v1",
+      "authors": [
+        "Manuel Mueller-Frank",
+        "Minghao Pan",
+        "Omer Tamuz"
+      ],
+      "abstract": "The value of proof-of-work cryptocurrencies critically depends on miners having incentives to follow the protocol. However, the Bitcoin mining protocol proposed by Nakamoto (2008) and implemented in practice is well known not to constitute an equilibrium: Eyal and Sirer (2018) construct a profitable deviation called ``selfish mining'' which relies on strategically delaying disclosure of newly mined blocks rather than publishing them immediately. We propose inertial mining, a novel mining protocol. When miners follow inertial mining, they produce the outcome intended by Nakamoto, i.e., a single longest chain. But unlike the Bitcoin mining protocol, inertial mining constitutes an equilibrium (assuming no miner controls more than half of the mining power). Indeed, neither selfish mining nor any other deviation is profitable. Furthermore, inertial mining only changes miners' behavior in the event of off-path forks, and can be implemented in Bitcoin without any changes to its consensus mechanism or blockchain architecture.",
+      "published": "2026-04-07T17:06:02Z",
+      "updated": "2026-04-07T17:06:02Z",
+      "published_date": "2026-04-07",
+      "categories": [
+        "cs.CR",
+        "cs.GT",
+        "econ.TH"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": null,
+      "citation": {
+        "text": "Manuel Mueller-Frank, Minghao Pan, Omer Tamuz (2026). Inertial Mining: Equilibrium Implementation of the Bitcoin Protocol. arXiv:2604.06092v1",
+        "bibtex": "@article{MuellerFrank2026260406092v1,\n  title={Inertial Mining: Equilibrium Implementation of the Bitcoin Protocol},\n  author={Manuel Mueller-Frank, Minghao Pan, Omer Tamuz},\n  journal={arXiv preprint arXiv:2604.06092v1},\n  year={2026}\n}"
+      }
+    },
+    {
+      "arxiv_id": "2604.05737v1",
+      "title": "Proceedings 17th Workshop on Programming Language Approaches to Concurrency and Communication-cEntric Software",
+      "url": "http://arxiv.org/abs/2604.05737v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.05737v1",
+      "authors": [
+        "Kirstin Peters",
+        "Lorenzo Gheri"
+      ],
+      "abstract": "This volume contains the proceedings of PLACES 2026, the 17th edition of the Workshop on Programming Language Approaches to Concurrency and Communication-cEntric Software. The workshop is scheduled to take place in Turin, Italy, on April 11, 2026, as a satellite event of ETAPS, the European Joint Conferences on Theory and Practice of Software. PLACES offers a forum for exchanging new ideas on how to address the challenges of concurrent and distributed programming and how to improve the foundations of modern and future computer applications. PLACES welcomes researchers from various fields, and its topics include the design of new programming languages, models for concurrent and distributed systems, type systems, program verification, and applications in various areas (e.g., microservices, sensor networks, blockchains, event processing, business process management).",
+      "published": "2026-04-07T11:39:22Z",
+      "updated": "2026-04-07T11:39:22Z",
+      "published_date": "2026-04-07",
+      "categories": [
+        "cs.PL"
+      ],
+      "doi": "10.4204/EPTCS.444",
+      "journal_ref": "EPTCS 444, 2026",
+      "comment": null,
+      "citation": {
+        "text": "Kirstin Peters, Lorenzo Gheri (2026). Proceedings 17th Workshop on Programming Language Approaches to Concurrency and Communication-cEntric Software. arXiv:2604.05737v1",
+        "bibtex": "@article{Peters2026260405737v1,\n  title={Proceedings 17th Workshop on Programming Language Approaches to Concurrency and Communication-cEntric Software},\n  author={Kirstin Peters, Lorenzo Gheri},\n  journal={arXiv preprint arXiv:2604.05737v1},\n  year={2026}\n}"
+      }
+    }
+  ]
+}
