@@ -19,6 +19,81 @@ from typing import Any
 ARXIV_API_URL = "https://export.arxiv.org/api/query"
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom", "arxiv": "http://arxiv.org/schemas/atom"}
 
+BLOCKCHAIN_KEYWORDS = [
+    # Core blockchain terms
+    "blockchain",
+    "distributed ledger",
+    "DLT",
+    # Consensus mechanisms
+    "proof of work",
+    "proof of stake",
+    "PoW consensus",
+    "PoS consensus",
+    "Byzantine fault tolerance",
+    "BFT consensus",
+    "PBFT",
+    # Cryptocurrencies and tokens
+    "cryptocurrency",
+    "Bitcoin",
+    "Ethereum",
+    "smart contract",
+    "token economy",
+    "tokenization",
+    "stablecoin",
+    "CBDC",
+    "central bank digital currency",
+    # DeFi and Web3
+    "decentralized finance",
+    "DeFi",
+    "Web3",
+    "decentralized application",
+    "dApp",
+    "decentralized exchange",
+    "DEX",
+    "liquidity pool",
+    "yield farming",
+    "automated market maker",
+    "AMM",
+    # NFT and digital assets
+    "NFT",
+    "non-fungible token",
+    "digital asset",
+    # Layer 2 and scaling
+    "layer 2",
+    "rollup",
+    "zero knowledge proof",
+    "zk-SNARK",
+    "zk-STARK",
+    "ZKP",
+    "state channel",
+    "sidechain",
+    "sharding",
+    # Privacy and security
+    "ring signature",
+    "homomorphic encryption blockchain",
+    "Merkle tree",
+    "hash chain",
+    # DAOs and governance
+    "DAO",
+    "decentralized autonomous organization",
+    "on-chain governance",
+    # Cross-chain
+    "cross-chain",
+    "interoperability blockchain",
+    "atomic swap",
+    "bridge protocol",
+    # Mining and validators
+    "mining pool",
+    "validator node",
+    "staking",
+    # Identity and credentials
+    "self-sovereign identity",
+    "SSI",
+    "decentralized identity",
+    "DID",
+    "verifiable credential",
+]
+
 
 def normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
@@ -104,34 +179,59 @@ def parse_entry(entry: ET.Element) -> dict[str, Any]:
     }
 
 
-def fetch_papers_for_date(target_date: date, keyword: str = "blockchain") -> list[dict[str, Any]]:
+def build_search_query(keywords: list[str]) -> str:
+    """Build arXiv search query with OR logic for multiple keywords."""
+    quoted_terms = []
+    for kw in keywords:
+        if " " in kw:
+            quoted_terms.append(f'all:"{kw}"')
+        else:
+            quoted_terms.append(f"all:{kw}")
+    return " OR ".join(quoted_terms)
+
+
+def fetch_papers_for_keyword(
+    target_date: date, keyword: str, seen_ids: set[str]
+) -> list[dict[str, Any]]:
+    """Fetch papers for a single keyword, skipping already seen arxiv_ids."""
     target_iso = target_date.isoformat()
     papers: list[dict[str, Any]] = []
     per_page = 100
     start = 0
-    max_pages = 20
-    should_stop = False
+    max_pages = 5
+
+    if " " in keyword:
+        search_term = f'all:"{keyword}"'
+    else:
+        search_term = f"all:{keyword}"
 
     for _ in range(max_pages):
         params = {
-            "search_query": f"all:{keyword}",
+            "search_query": search_term,
             "start": start,
             "max_results": per_page,
             "sortBy": "submittedDate",
             "sortOrder": "descending",
         }
         url = f"{ARXIV_API_URL}?{urllib.parse.urlencode(params)}"
-        data = request_feed(url)
+        try:
+            data = request_feed(url)
+        except Exception:
+            break
         root = ET.fromstring(data)
         entries = root.findall("atom:entry", ATOM_NS)
         if not entries:
             break
 
+        should_stop = False
         for entry in entries:
             paper = parse_entry(entry)
             paper_date = paper["published_date"]
+            arxiv_id = paper["arxiv_id"]
             if paper_date == target_iso:
-                papers.append(paper)
+                if arxiv_id and arxiv_id not in seen_ids:
+                    seen_ids.add(arxiv_id)
+                    papers.append(paper)
             elif paper_date and paper_date < target_iso:
                 should_stop = True
                 break
@@ -140,8 +240,29 @@ def fetch_papers_for_date(target_date: date, keyword: str = "blockchain") -> lis
             break
         start += per_page
 
-    papers.sort(key=lambda p: p["published"], reverse=True)
     return papers
+
+
+def fetch_papers_for_date(
+    target_date: date, keywords: list[str] | None = None
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Fetch papers for all keywords, deduplicating by arxiv_id.
+    
+    Returns a tuple of (papers, keywords_used).
+    """
+    if keywords is None:
+        keywords = BLOCKCHAIN_KEYWORDS
+
+    seen_ids: set[str] = set()
+    all_papers: list[dict[str, Any]] = []
+
+    for keyword in keywords:
+        papers = fetch_papers_for_keyword(target_date, keyword, seen_ids)
+        all_papers.extend(papers)
+        time.sleep(0.5)
+
+    all_papers.sort(key=lambda p: p["published"], reverse=True)
+    return all_papers, keywords
 
 
 def resolve_target_date(date_input: str | None) -> date:
@@ -166,13 +287,14 @@ def main() -> int:
     args = parser.parse_args()
 
     target_date = resolve_target_date(args.date)
-    papers = fetch_papers_for_date(target_date=target_date)
+    papers, keywords_used = fetch_papers_for_date(target_date=target_date)
 
     payload = {
         "date": target_date.isoformat(),
         "query": {
             "source": "arXiv API",
-            "keyword": "blockchain",
+            "keywords": keywords_used,
+            "keyword_count": len(keywords_used),
             "sort_by": "submittedDate desc",
         },
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
