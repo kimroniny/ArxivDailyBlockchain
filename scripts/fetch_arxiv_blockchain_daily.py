@@ -73,6 +73,16 @@ def parse_entry(entry: ET.Element) -> dict[str, Any]:
     }
 
 
+def build_date_range_query(target_date: date) -> str:
+    """Build arXiv submittedDate range query for a specific date.
+    
+    arXiv API uses the format: submittedDate:[YYYYMMDDTTTT TO YYYYMMDDTTTT]
+    We query from the start of the day to the end of the day in UTC.
+    """
+    date_str = target_date.strftime("%Y%m%d")
+    return f"submittedDate:[{date_str}0000 TO {date_str}2359]"
+
+
 def build_search_query(keywords: list[str]) -> str:
     """Build arXiv search query with OR logic for multiple keywords."""
     quoted_terms = []
@@ -87,7 +97,12 @@ def build_search_query(keywords: list[str]) -> str:
 def fetch_papers_for_keyword(
     target_date: date, keyword: str, seen_ids: set[str]
 ) -> list[dict[str, Any]]:
-    """Fetch papers for a single keyword, skipping already seen arxiv_ids."""
+    """Fetch papers for a single keyword, skipping already seen arxiv_ids.
+    
+    Uses arXiv API with:
+    - submittedDate range filter for the target date
+    - cat:cs.* filter to limit to computer science papers
+    """
     target_iso = target_date.isoformat()
     papers: list[dict[str, Any]] = []
     per_page = 100
@@ -95,13 +110,16 @@ def fetch_papers_for_keyword(
     max_pages = 5
 
     if " " in keyword:
-        search_term = f'all:"{keyword}"'
+        keyword_term = f'all:"{keyword}"'
     else:
-        search_term = f"all:{keyword}"
+        keyword_term = f"all:{keyword}"
+    
+    date_range = build_date_range_query(target_date)
+    search_query = f"({keyword_term}) AND ({date_range}) AND (cat:cs.*)"
 
     for _ in range(max_pages):
         params = {
-            "search_query": search_term,
+            "search_query": search_query,
             "start": start,
             "max_results": per_page,
             "sortBy": "submittedDate",
@@ -117,20 +135,14 @@ def fetch_papers_for_keyword(
         if not entries:
             break
 
-        should_stop = False
         for entry in entries:
             paper = parse_entry(entry)
-            paper_date = paper["published_date"]
             arxiv_id = paper["arxiv_id"]
-            if paper_date == target_iso:
-                if arxiv_id and arxiv_id not in seen_ids:
-                    seen_ids.add(arxiv_id)
-                    papers.append(paper)
-            elif paper_date and paper_date < target_iso:
-                should_stop = True
-                break
+            if arxiv_id and arxiv_id not in seen_ids:
+                seen_ids.add(arxiv_id)
+                papers.append(paper)
 
-        if should_stop:
+        if len(entries) < per_page:
             break
         start += per_page
 
@@ -192,6 +204,8 @@ def main() -> int:
             "keyword_count": len(keywords_used),
             "gate_keywords": GATE_KEYWORDS,
             "gate_keyword_count": len(GATE_KEYWORDS),
+            "category_filter": "cs.*",
+            "date_filter": f"submittedDate:[{target_date.strftime('%Y%m%d')}0000 TO {target_date.strftime('%Y%m%d')}2359]",
             "sort_by": "submittedDate desc",
         },
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
