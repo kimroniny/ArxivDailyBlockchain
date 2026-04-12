@@ -35,7 +35,7 @@ Papers are saved as JSON files in the `data/` directory with the naming pattern:
 
 Each JSON file contains:
 - `date`: Target date
-- `query`: Query metadata (source, keyword, sort order)
+- `query`: Query metadata (source, keywords list, keyword_count, sort order)
 - `generated_at_utc`: Timestamp of when the file was generated
 - `paper_count`: Number of papers found
 - `papers`: Array of paper objects with:
