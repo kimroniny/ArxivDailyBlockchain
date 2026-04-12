@@ -15,6 +15,8 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from webhook_utils import WEBHOOK_URL, send_papers_to_webhook
+
 EPRINT_RSS_URL = "https://eprint.iacr.org/rss/rss.xml"
 
 BLOCKCHAIN_KEYWORDS = [
@@ -281,6 +283,11 @@ def main() -> int:
         default="data",
         help="Output directory for generated JSON files (default: data).",
     )
+    parser.add_argument(
+        "--webhook-url",
+        default=WEBHOOK_URL,
+        help="Webhook URL used to send each fetched paper.",
+    )
     args = parser.parse_args()
 
     target_date = resolve_target_date(args.date)
@@ -307,6 +314,8 @@ def main() -> int:
     output_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"Saved {len(papers)} paper(s) to {output_file}")
+    success, failed = send_papers_to_webhook(papers, webhook_url=args.webhook_url)
+    print(f"Webhook delivery complete: success={success}, failed={failed}")
     return 0
 
 
