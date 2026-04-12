@@ -96,9 +96,45 @@ BLOCKCHAIN_KEYWORDS = [
     "verifiable credential",
 ]
 
+GATE_KEYWORDS = [
+    "blockchain",
+    "distributed ledger",
+    "smart contract",
+    "bitcoin",
+    "ethereum",
+    "cryptocurrency",
+    "stablecoin",
+    "cbdc",
+    "decentralized finance",
+    "defi",
+    "dao",
+    "rollup",
+    "layer 2",
+    "cross-chain",
+    "sidechain",
+    "validator",
+    "staking",
+    "byzantine",
+    "pbft",
+]
+
 
 def normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def contains_any_keyword(text: str, keywords: list[str]) -> bool:
+    lowered = text.lower()
+    for kw in keywords:
+        pattern = r"\b" + re.escape(kw.lower()) + r"\b"
+        if re.search(pattern, lowered):
+            return True
+    return False
+
+
+def passes_gate_filter(paper: dict[str, Any], gate_keywords: list[str]) -> bool:
+    searchable_text = f"{paper.get('title', '')} {paper.get('abstract', '')}"
+    return contains_any_keyword(searchable_text, gate_keywords)
 
 
 def request_feed(url: str, retries: int = 3, sleep_seconds: float = 2.0) -> bytes:
@@ -246,7 +282,7 @@ def fetch_papers_for_keyword(
 
 
 def fetch_papers_for_date(
-    target_date: date, keywords: list[str] | None = None
+    target_date: date, keywords: list[str] | None = None, gate_keywords: list[str] | None = None
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Fetch papers for all keywords, deduplicating by arxiv_id.
     
@@ -254,13 +290,15 @@ def fetch_papers_for_date(
     """
     if keywords is None:
         keywords = BLOCKCHAIN_KEYWORDS
+    if gate_keywords is None:
+        gate_keywords = GATE_KEYWORDS
 
     seen_ids: set[str] = set()
     all_papers: list[dict[str, Any]] = []
 
     for keyword in keywords:
         papers = fetch_papers_for_keyword(target_date, keyword, seen_ids)
-        all_papers.extend(papers)
+        all_papers.extend([paper for paper in papers if passes_gate_filter(paper, gate_keywords)])
         time.sleep(0.5)
 
     all_papers.sort(key=lambda p: p["published"], reverse=True)
@@ -302,6 +340,8 @@ def main() -> int:
             "source": "arXiv API",
             "keywords": keywords_used,
             "keyword_count": len(keywords_used),
+            "gate_keywords": GATE_KEYWORDS,
+            "gate_keyword_count": len(GATE_KEYWORDS),
             "sort_by": "submittedDate desc",
         },
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
