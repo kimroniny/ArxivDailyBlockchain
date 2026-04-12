@@ -5,135 +5,27 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 import time
-import urllib.error
 import urllib.parse
-import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from blockchain_common import (
+    ARXIV_BLOCKCHAIN_KEYWORDS as BLOCKCHAIN_KEYWORDS,
+    GATE_KEYWORDS,
+    format_arxiv_citation,
+    normalize_space,
+    passes_gate_filter,
+    request_feed,
+    resolve_target_date,
+)
 from webhook_utils import WEBHOOK_URL, send_papers_to_webhook
 
 ARXIV_API_URL = "https://export.arxiv.org/api/query"
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom", "arxiv": "http://arxiv.org/schemas/atom"}
-
-BLOCKCHAIN_KEYWORDS = [
-    # Core blockchain terms
-    "blockchain",
-    "distributed ledger",
-    "DLT",
-    # Consensus mechanisms
-    "proof of work",
-    "proof of stake",
-    "PoW consensus",
-    "PoS consensus",
-    "Byzantine fault tolerance",
-    "BFT consensus",
-    "PBFT",
-    # Cryptocurrencies and tokens
-    "cryptocurrency",
-    "Bitcoin",
-    "Ethereum",
-    "smart contract",
-    "token economy",
-    "tokenization",
-    "stablecoin",
-    "CBDC",
-    "central bank digital currency",
-    # DeFi and Web3
-    "decentralized finance",
-    "DeFi",
-    "Web3",
-    "decentralized application",
-    "dApp",
-    "decentralized exchange",
-    "DEX",
-    "liquidity pool",
-    "yield farming",
-    "automated market maker",
-    "AMM",
-    # NFT and digital assets
-    "NFT",
-    "non-fungible token",
-    "digital asset",
-    # Layer 2 and scaling
-    "layer 2",
-    "rollup",
-    "zero knowledge proof",
-    "zk-SNARK",
-    "zk-STARK",
-    "ZKP",
-    "state channel",
-    "sidechain",
-    "sharding",
-    # Privacy and security
-    "ring signature",
-    "homomorphic encryption blockchain",
-    "Merkle tree",
-    "hash chain",
-    # DAOs and governance
-    "DAO",
-    "decentralized autonomous organization",
-    "on-chain governance",
-    # Cross-chain
-    "cross-chain",
-    "interoperability blockchain",
-    "atomic swap",
-    "bridge protocol",
-    # Mining and validators
-    "mining pool",
-    "validator node",
-    "staking",
-    # Identity and credentials
-    "self-sovereign identity",
-    "SSI",
-    "decentralized identity",
-    "DID",
-    "verifiable credential",
-]
-
-
-def normalize_space(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def request_feed(url: str, retries: int = 3, sleep_seconds: float = 2.0) -> bytes:
-    last_error: Exception | None = None
-    for attempt in range(1, retries + 1):
-        try:
-            with urllib.request.urlopen(url, timeout=30) as response:
-                return response.read()
-        except (urllib.error.URLError, TimeoutError) as error:
-            last_error = error
-            if attempt < retries:
-                time.sleep(sleep_seconds * attempt)
-    assert last_error is not None
-    raise last_error
-
-
-def build_bibtex_key(first_author: str, published_year: str, arxiv_id: str) -> str:
-    author_token = re.sub(r"[^A-Za-z0-9]", "", first_author.split()[-1]) or "author"
-    id_token = re.sub(r"[^A-Za-z0-9]", "", arxiv_id)
-    return f"{author_token}{published_year}{id_token}"
-
-
-def format_citation(authors: list[str], title: str, year: str, arxiv_id: str) -> dict[str, str]:
-    author_text = ", ".join(authors)
-    text_citation = f"{author_text} ({year}). {title}. arXiv:{arxiv_id}"
-    bibtex_key = build_bibtex_key(authors[0] if authors else "author", year, arxiv_id)
-    bibtex = (
-        f"@article{{{bibtex_key},\n"
-        f"  title={{{title}}},\n"
-        f"  author={{{author_text}}},\n"
-        f"  journal={{arXiv preprint arXiv:{arxiv_id}}},\n"
-        f"  year={{{year}}}\n"
-        f"}}"
-    )
-    return {"text": text_citation, "bibtex": bibtex}
 
 
 def parse_entry(entry: ET.Element) -> dict[str, Any]:
@@ -162,7 +54,7 @@ def parse_entry(entry: ET.Element) -> dict[str, Any]:
             pdf_url = href
             break
 
-    citation = format_citation(authors, title, published_year, arxiv_id)
+    citation = format_arxiv_citation(authors, title, published_year, arxiv_id)
     return {
         "arxiv_id": arxiv_id,
         "title": title,
@@ -246,7 +138,7 @@ def fetch_papers_for_keyword(
 
 
 def fetch_papers_for_date(
-    target_date: date, keywords: list[str] | None = None
+    target_date: date, keywords: list[str] | None = None, gate_keywords: list[str] | None = None
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Fetch papers for all keywords, deduplicating by arxiv_id.
     
@@ -254,23 +146,19 @@ def fetch_papers_for_date(
     """
     if keywords is None:
         keywords = BLOCKCHAIN_KEYWORDS
+    if gate_keywords is None:
+        gate_keywords = GATE_KEYWORDS
 
     seen_ids: set[str] = set()
     all_papers: list[dict[str, Any]] = []
 
     for keyword in keywords:
         papers = fetch_papers_for_keyword(target_date, keyword, seen_ids)
-        all_papers.extend(papers)
+        all_papers.extend([paper for paper in papers if passes_gate_filter(paper, gate_keywords)])
         time.sleep(0.5)
 
     all_papers.sort(key=lambda p: p["published"], reverse=True)
     return all_papers, keywords
-
-
-def resolve_target_date(date_input: str | None) -> date:
-    if date_input:
-        return datetime.strptime(date_input, "%Y-%m-%d").date()
-    return (datetime.now(timezone.utc) - timedelta(days=1)).date()
 
 
 def main() -> int:
@@ -302,6 +190,8 @@ def main() -> int:
             "source": "arXiv API",
             "keywords": keywords_used,
             "keyword_count": len(keywords_used),
+            "gate_keywords": GATE_KEYWORDS,
+            "gate_keyword_count": len(GATE_KEYWORDS),
             "sort_by": "submittedDate desc",
         },
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),

@@ -7,148 +7,26 @@ import argparse
 import json
 import re
 import sys
-import time
-import urllib.error
-import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from blockchain_common import (
+    EPRINT_BLOCKCHAIN_KEYWORDS as BLOCKCHAIN_KEYWORDS,
+    GATE_KEYWORDS,
+    format_eprint_citation,
+    matches_keywords,
+    normalize_space,
+    passes_gate_filter,
+    request_feed,
+    resolve_target_date,
+)
 from webhook_utils import WEBHOOK_URL, send_papers_to_webhook
 
 EPRINT_RSS_URL = "https://eprint.iacr.org/rss/rss.xml"
 
-BLOCKCHAIN_KEYWORDS = [
-    # Core blockchain terms
-    "blockchain",
-    "distributed ledger",
-    "DLT",
-    # Consensus mechanisms
-    "proof of work",
-    "proof of stake",
-    "PoW",
-    "PoS",
-    "Byzantine fault tolerance",
-    "BFT",
-    "PBFT",
-    "consensus protocol",
-    # Cryptocurrencies and tokens
-    "cryptocurrency",
-    "Bitcoin",
-    "Ethereum",
-    "smart contract",
-    "token",
-    "stablecoin",
-    "CBDC",
-    "central bank digital currency",
-    # DeFi and Web3
-    "decentralized finance",
-    "DeFi",
-    "Web3",
-    "decentralized application",
-    "dApp",
-    "decentralized exchange",
-    "DEX",
-    "AMM",
-    "automated market maker",
-    # NFT and digital assets
-    "NFT",
-    "non-fungible token",
-    # Layer 2 and scaling
-    "layer 2",
-    "rollup",
-    "zero knowledge proof",
-    "zero-knowledge proof",
-    "zk-SNARK",
-    "zk-STARK",
-    "zkSNARK",
-    "zkSTARK",
-    "ZKP",
-    "state channel",
-    "sidechain",
-    "sharding",
-    # Privacy
-    "ring signature",
-    "Merkle tree",
-    "hash chain",
-    # DAOs and governance
-    "DAO",
-    "decentralized autonomous organization",
-    "on-chain governance",
-    # Cross-chain
-    "cross-chain",
-    "interoperability",
-    "atomic swap",
-    "bridge protocol",
-    # Mining and validators
-    "mining pool",
-    "validator",
-    "staking",
-    # Identity
-    "self-sovereign identity",
-    "SSI",
-    "decentralized identity",
-    "DID",
-    "verifiable credential",
-    # Cryptographic primitives commonly used in blockchain
-    "threshold signature",
-    "multi-party computation",
-    "MPC",
-    "secure computation",
-    "commitment scheme",
-    "verifiable computation",
-    "succinct argument",
-    "SNARK",
-    "STARK",
-]
-
 DC_NS = "http://purl.org/dc/elements/1.1/"
-
-
-def normalize_space(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def request_feed(url: str, retries: int = 3, sleep_seconds: float = 2.0) -> bytes:
-    last_error: Exception | None = None
-    for attempt in range(1, retries + 1):
-        try:
-            req = urllib.request.Request(
-                url,
-                headers={"User-Agent": "ArxivDailyBlockchain/1.0 (research tool)"},
-            )
-            with urllib.request.urlopen(req, timeout=60) as response:
-                return response.read()
-        except (urllib.error.URLError, TimeoutError) as error:
-            last_error = error
-            if attempt < retries:
-                time.sleep(sleep_seconds * attempt)
-    assert last_error is not None
-    raise last_error
-
-
-def build_bibtex_key(first_author: str, published_year: str, eprint_id: str) -> str:
-    author_token = re.sub(r"[^A-Za-z0-9]", "", first_author.split()[-1]) or "author"
-    id_token = re.sub(r"[^A-Za-z0-9]", "", eprint_id)
-    return f"{author_token}{published_year}eprint{id_token}"
-
-
-def format_citation(authors: list[str], title: str, year: str, eprint_id: str) -> dict[str, str]:
-    author_text = ", ".join(authors)
-    text_citation = f"{author_text} ({year}). {title}. IACR ePrint:{eprint_id}"
-    bibtex_key = build_bibtex_key(authors[0] if authors else "author", year, eprint_id)
-    bibtex = (
-        f"@misc{{{bibtex_key},\n"
-        f"  title={{{title}}},\n"
-        f"  author={{{author_text}}},\n"
-        f"  howpublished={{Cryptology ePrint Archive, Paper {eprint_id}}},\n"
-        f"  year={{{year}}},\n"
-        f"  url={{https://eprint.iacr.org/{eprint_id}}}\n"
-        f"}}"
-    )
-    return {"text": text_citation, "bibtex": bibtex}
-
 
 def parse_pubdate(pubdate_str: str) -> tuple[str, str]:
     """Parse RSS pubDate and return (date_iso, full_timestamp)."""
@@ -159,17 +37,6 @@ def parse_pubdate(pubdate_str: str) -> tuple[str, str]:
         return dt.strftime("%Y-%m-%d"), dt.isoformat()
     except ValueError:
         return "", pubdate_str
-
-
-def matches_keywords(title: str, abstract: str, keywords: list[str]) -> bool:
-    """Check if title or abstract contains any of the keywords (case-insensitive)."""
-    text = f"{title} {abstract}".lower()
-    for kw in keywords:
-        pattern = r"\b" + re.escape(kw.lower()) + r"\b"
-        if re.search(pattern, text):
-            return True
-    return False
-
 
 def parse_item(item: ET.Element, keywords: list[str]) -> dict[str, Any] | None:
     """Parse an RSS item and return paper dict if it matches keywords."""
@@ -207,7 +74,7 @@ def parse_item(item: ET.Element, keywords: list[str]) -> dict[str, Any] | None:
     published_date, published_full = parse_pubdate(pubdate_str)
     published_year = published_date[:4] if published_date else ""
 
-    citation = format_citation(authors, title, published_year, eprint_id)
+    citation = format_eprint_citation(authors, title, published_year, eprint_id)
 
     return {
         "eprint_id": eprint_id,
@@ -225,7 +92,7 @@ def parse_item(item: ET.Element, keywords: list[str]) -> dict[str, Any] | None:
 
 
 def fetch_papers_for_date(
-    target_date: date, keywords: list[str] | None = None
+    target_date: date, keywords: list[str] | None = None, gate_keywords: list[str] | None = None
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Fetch ePrint papers for a specific date that match blockchain keywords.
 
@@ -233,11 +100,17 @@ def fetch_papers_for_date(
     """
     if keywords is None:
         keywords = BLOCKCHAIN_KEYWORDS
+    if gate_keywords is None:
+        gate_keywords = GATE_KEYWORDS
 
     target_iso = target_date.isoformat()
 
     print(f"Fetching ePrint RSS feed...")
-    data = request_feed(EPRINT_RSS_URL)
+    data = request_feed(
+        EPRINT_RSS_URL,
+        timeout=60,
+        headers={"User-Agent": "ArxivDailyBlockchain/1.0 (research tool)"},
+    )
     root = ET.fromstring(data)
 
     channel = root.find("channel")
@@ -257,18 +130,12 @@ def fetch_papers_for_date(
 
         if paper_date == target_iso:
             if eprint_id and eprint_id not in seen_ids:
-                seen_ids.add(eprint_id)
-                papers.append(paper)
+                if passes_gate_filter(paper, gate_keywords):
+                    seen_ids.add(eprint_id)
+                    papers.append(paper)
 
     papers.sort(key=lambda p: p.get("published", ""), reverse=True)
     return papers, keywords
-
-
-def resolve_target_date(date_input: str | None) -> date:
-    if date_input:
-        return datetime.strptime(date_input, "%Y-%m-%d").date()
-    return (datetime.now(timezone.utc) - timedelta(days=1)).date()
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -301,6 +168,8 @@ def main() -> int:
             "source": "IACR ePrint Archive",
             "keywords": keywords_used,
             "keyword_count": len(keywords_used),
+            "gate_keywords": GATE_KEYWORDS,
+            "gate_keyword_count": len(GATE_KEYWORDS),
             "filter": "keyword match in title/abstract",
         },
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
