@@ -66,9 +66,62 @@
       "verifiable credential"
     ],
     "keyword_count": 61,
+    "gate_keywords": [
+      "blockchain",
+      "distributed ledger",
+      "smart contract",
+      "bitcoin",
+      "ethereum",
+      "cryptocurrency",
+      "stablecoin",
+      "cbdc",
+      "decentralized finance",
+      "defi",
+      "dao",
+      "rollup",
+      "layer 2",
+      "cross-chain",
+      "sidechain",
+      "validator",
+      "staking",
+      "byzantine",
+      "pbft"
+    ],
+    "gate_keyword_count": 19,
+    "category_filter": "cs.*",
+    "date_filter": "submittedDate:[202604100000 TO 202604102359]",
     "sort_by": "submittedDate desc"
   },
-  "generated_at_utc": "2026-04-12T04:16:16.996746+00:00",
-  "paper_count": 0,
-  "papers": []
+  "generated_at_utc": "2026-04-13T03:13:19.243893+00:00",
+  "paper_count": 1,
+  "papers": [
+    {
+      "arxiv_id": "2604.08914v1",
+      "title": "Finding Nemo-Nemo: CFT DAG-based Consensus in the WAN",
+      "url": "http://arxiv.org/abs/2604.08914v1",
+      "pdf_url": "https://arxiv.org/pdf/2604.08914v1",
+      "authors": [
+        "Rithwik Kerur",
+        "Pasindu Tennage",
+        "Philipp Jovanovic",
+        "Dahlia Malkhi",
+        "Alberto Sonnino",
+        "Igor Zablotchi"
+      ],
+      "abstract": "This paper introduces Nemo-Nemo, a practical crash-fault tolerant (CFT) consensus protocol designed to outperform existing protocols in wide-area networks by bridging design principles from the CFT and Byzantine-fault tolerant (BFT) worlds. By structuring command propagation through a causally ordered DAG, Nemo-Nemo allows all consensus replicas to propose commands with a naturally self-regulating communication regime. By exploiting multi-leader architecture, Nemo-Nemo avoids the performance bottleneck inherent to single-leader protocols. By separating command dissemination from consensus logic, Nemo-Nemo handles challenging network conditions even when consensus commits are stalled. Moreover, leader proposals that miss a deadline are never dropped, but deterministically deferred and executed later, preserving throughput under transient network delays. And by enabling Nemo-Nemo to commit on a DAG in just two network hops, it matches the latency of existing CFT systems, while achieving significantly higher throughput. The result is a robust, deployable system: the first DAG-based CFT consensus protocol proven to exceed state-of-the-art wide-area network performance in both speed and resilience.",
+      "published": "2026-04-10T03:20:16Z",
+      "updated": "2026-04-10T03:20:16Z",
+      "published_date": "2026-04-10",
+      "categories": [
+        "cs.DC"
+      ],
+      "doi": null,
+      "journal_ref": null,
+      "comment": null,
+      "citation": {
+        "text": "Rithwik Kerur, Pasindu Tennage, Philipp Jovanovic, Dahlia Malkhi, Alberto Sonnino, Igor Zablotchi (2026). Finding Nemo-Nemo: CFT DAG-based Consensus in the WAN. arXiv:2604.08914v1",
+        "bibtex": "@article{Kerur2026260408914v1,\n  title={Finding Nemo-Nemo: CFT DAG-based Consensus in the WAN},\n  author={Rithwik Kerur, Pasindu Tennage, Philipp Jovanovic, Dahlia Malkhi, Alberto Sonnino, Igor Zablotchi},\n  journal={arXiv preprint arXiv:2604.08914v1},\n  year={2026}\n}"
+      }
+    }
+  ]
 }
